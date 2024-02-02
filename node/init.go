@@ -21,7 +21,7 @@ import (
 )
 
 const (
-	protocolID         = "/bitcon/0.0.1"
+	protocolID         = "/bitcoin/0.0.1"
 	DiscoveryNamespace = "bitcoin"
 )
 
