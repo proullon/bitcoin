@@ -153,13 +153,8 @@ func (n *Node) Stop() {
 func (n *Node) status() Status {
 	n.m.RLock()
 	s := n._status
-	n.m.Unlock()
+	n.m.RUnlock()
 	return s
-}
-
-func (n *Node) run() {
-	for n.status() != Stopping {
-	}
 }
 
 func (n *Node) incomingTransaction(tx *blockchain.Transaction) {
