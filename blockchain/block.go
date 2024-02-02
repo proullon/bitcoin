@@ -26,6 +26,19 @@ type Block struct {
 	Owner  [91]byte
 }
 
+// DecodeBlock from binary format
+func DecodeBlock(data []byte) (*Block, error) {
+	buf := bytes.NewBuffer(data)
+	b := &Block{}
+
+	err := binary.Read(buf, binary.LittleEndian, b)
+	if err != nil {
+		return nil, err
+	}
+	return b, nil
+}
+
+// Encode block into binary format
 func (b Block) Encode() ([]byte, error) {
 	var buf bytes.Buffer
 
