@@ -5,6 +5,7 @@ import (
 	"crypto/ecdsa"
 	"crypto/rand"
 	"crypto/sha256"
+	"crypto/x509"
 	"encoding/binary"
 	"fmt"
 	"math/bits"
@@ -102,7 +103,24 @@ func GenerateValideHash(b *Block) error {
 	}
 }
 
-func Sign(b *Block, priv *ecdsa.PrivateKey) ([]byte, error) {
+// Sign previous hash and insert public key
+func (b *Block) Sign(privateKey *ecdsa.PrivateKey) error {
+	sig, err := ecdsa.SignASN1(rand.Reader, privateKey, b.Header.Prev[:])
+	if err != nil {
+		return fmt.Errorf("cannot sign previous block's hash: %s", err)
+	}
+	b.Header.Prev = [sha256.Size]byte(sig)
 
-	return nil, nil
+	ecdshPublicKey, err := privateKey.PublicKey.ECDH()
+	if err != nil {
+		return fmt.Errorf("cannot convert public key to ECDH: %s", err)
+	}
+
+	pubkey, err := x509.MarshalPKIXPublicKey(ecdshPublicKey)
+	if err != nil {
+		return fmt.Errorf("cannot encode public key to ASN1 DER: %s", err)
+	}
+
+	b.Owner = [91]byte(pubkey)
+	return nil
 }
